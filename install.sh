@@ -30,6 +30,17 @@ detect_distro() {
     log "Detected distro: $PRETTY_NAME"
 }
 
+install_maven() {
+    if command -v mvn &>/dev/null; then
+        warn "Maven is already installed. Skipping."
+        return 0
+    fi
+
+    log "Installing Maven..."
+    sudo apt install -y maven
+    log "Maven $(mvn --version | head -1) installed."
+}
+
 install_python() {
     log "Installing Python 3 and pip..."
     sudo apt update
@@ -137,6 +148,7 @@ main() {
     echo ""
     echo "The following will be installed:"
     echo "  - Python 3 + pip"
+    echo "  - Maven"
     echo "  - Visual Studio Code"
     echo "  - IntelliJ IDEA Community"
     echo "  - Google Chrome"
@@ -150,6 +162,7 @@ main() {
 
     echo ""
     install_python
+    install_maven
     install_vscode
     install_intellij
     install_chrome
