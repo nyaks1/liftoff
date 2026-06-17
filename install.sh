@@ -110,14 +110,32 @@ install_intellij() {
     if command -v snap &>/dev/null; then
         sudo snap install intellij-idea-community --classic
     else
-        warn "Snap not available. Installing JetBrains Toolbox..."
-        wget -qO /tmp/jetbrains-toolbox.tar.gz "https://download.jetbrains.com/toolbox/jetbrains-toolbox-latest.tar.gz"
-        tar -xzf /tmp/jetbrains-toolbox.tar.gz -C /opt/
-        /opt/jetbrains-toolbox-*/jetbrains-toolbox.sh &
-        warn "Toolbox launched. Install IntelliJ IDEA Community from its GUI."
-    fi
+        log "Downloading IntelliJ IDEA Community..."
+        wget -qO /tmp/intellij.tar.gz "https://download.jetbrains.com/idea/ideaIC-2024.3.4.tar.gz" || {
+            err "Failed to download IntelliJ IDEA."
+            return 1
+        }
 
-    log "IntelliJ installed."
+        sudo mkdir -p /opt/intellij
+        sudo tar -xzf /tmp/intellij.tar.gz -C /opt/intellij --strip-components=1
+        rm -f /tmp/intellij.tar.gz
+
+        sudo ln -sf /opt/intellij/bin/idea /usr/local/bin/intellij-idea-community
+
+        sudo tee /usr/share/applications/intellij-idea-community.desktop > /dev/null <<EOF
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=IntelliJ IDEA Community
+Icon=/opt/intellij/bin/idea.svg
+Exec="/opt/intellij/bin/idea" %f
+Categories=Development;IDE;
+Terminal=false
+StartupWMClass=jetbrains-idea-ce
+EOF
+
+        log "IntelliJ IDEA Community installed."
+    fi
 }
 
 install_chrome() {
