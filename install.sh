@@ -128,13 +128,21 @@ install_chrome() {
 
     log "Installing Google Chrome..."
 
-    wget -qO /tmp/google-chrome.deb "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+    wget -qO /tmp/google-chrome.deb "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" || {
+        err "Failed to download Google Chrome."
+        return 1
+    }
+
     sudo apt install -y /tmp/google-chrome.deb || {
         sudo apt install -f -y
         sudo dpkg -i /tmp/google-chrome.deb
+    } || {
+        err "Failed to install Google Chrome."
+        rm -f /tmp/google-chrome.deb
+        return 1
     }
-    rm -f /tmp/google-chrome.deb
 
+    rm -f /tmp/google-chrome.deb
     log "Google Chrome installed."
 }
 
@@ -146,10 +154,17 @@ install_brave() {
 
     log "Installing Brave Browser..."
 
-    sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+    sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg || {
+        err "Failed to download Brave keyring."
+        return 1
+    }
+
     echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
     sudo apt update
-    sudo apt install -y brave-browser
+    sudo apt install -y brave-browser || {
+        err "Failed to install Brave Browser."
+        return 1
+    }
 
     log "Brave Browser installed."
 }
@@ -185,13 +200,13 @@ main() {
     fi
 
     echo ""
-    install_python
-    install_java
-    install_maven
-    install_vscode
-    install_intellij
-    install_chrome
-    install_brave
+    install_python || true
+    install_java || true
+    install_maven || true
+    install_vscode || true
+    install_intellij || true
+    install_chrome || true
+    install_brave || true
 
     echo ""
     echo "=========================================="
