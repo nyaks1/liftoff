@@ -30,6 +30,24 @@ detect_distro() {
     log "Detected distro: $PRETTY_NAME"
 }
 
+install_java() {
+    if command -v java &>/dev/null; then
+        warn "Java is already installed. Skipping."
+        return 0
+    fi
+
+    log "Installing Java (OpenJDK 17)..."
+    sudo apt update
+    sudo apt install -y openjdk-17-jdk
+
+    if command -v java &>/dev/null; then
+        log "Java $(java -version 2>&1 | head -1) installed."
+    else
+        err "Java installation failed."
+        return 1
+    fi
+}
+
 install_maven() {
     if command -v mvn &>/dev/null; then
         warn "Maven is already installed. Skipping."
@@ -42,6 +60,11 @@ install_maven() {
 }
 
 install_python() {
+    if command -v python3 &>/dev/null; then
+        warn "Python is already installed. Skipping."
+        return 0
+    fi
+
     log "Installing Python 3 and pip..."
     sudo apt update
     sudo apt install -y python3 python3-pip python3-venv build-essential
@@ -148,6 +171,7 @@ main() {
     echo ""
     echo "The following will be installed:"
     echo "  - Python 3 + pip"
+    echo "  - Java (OpenJDK 17)"
     echo "  - Maven"
     echo "  - Visual Studio Code"
     echo "  - IntelliJ IDEA Community"
@@ -162,6 +186,7 @@ main() {
 
     echo ""
     install_python
+    install_java
     install_maven
     install_vscode
     install_intellij
