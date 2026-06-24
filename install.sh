@@ -36,9 +36,9 @@ install_java() {
         return 0
     fi
 
-    log "Installing Java (OpenJDK 17)..."
+    log "Installing Java (OpenJDK 21)..."
     sudo apt update
-    sudo apt install -y openjdk-17-jdk
+    sudo apt install -y openjdk-21-jdk
 
     if command -v java &>/dev/null; then
         log "Java $(java -version 2>&1 | head -1) installed."
@@ -204,7 +204,7 @@ main() {
     echo ""
     echo "The following will be installed:"
     echo "  - Python 3 + pip"
-    echo "  - Java (OpenJDK 17)"
+    echo "  - Java (OpenJDK 21)"
     echo "  - Maven"
     echo "  - Visual Studio Code"
     echo "  - IntelliJ IDEA Community"
